@@ -20,8 +20,4 @@ class Visit < ActiveRecord::Base
           :shortened_url_id => shortened_url_id)
   end
 
-  # def created_at
-  #   self.class.find(:id).created_at
-  # end
-
 end

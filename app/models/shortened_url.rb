@@ -31,11 +31,12 @@ class ShortenedUrl < ActiveRecord::Base
 
     submitter_id = submitter.id
 
+
     new_url = ShortenedUrl.create!(:submitter_id => submitter_id,
                          :long_url => long_url,
                          :short_url => short_url)
-
-    Visit.record_visit!(submitter_id, new_url.id)
+    #Visit.record_visit!(submitter_id, new_url.id)
+    new_url
   end
 
   def num_clicks
@@ -43,11 +44,11 @@ class ShortenedUrl < ActiveRecord::Base
   end
 
   def num_uniques
-    visits.uniq.count #count(:visitors).distinct
+    visits.distinct.count
   end
 
   def num_recent_uniques
-    visits.uniq.count { |visit| visit.created_at > 10.minutes.ago }
+    visits.select { |visit| visit.created_at > 10.minutes.ago }.uniq.count
   end
 
 end
