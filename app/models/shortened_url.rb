@@ -38,4 +38,16 @@ class ShortenedUrl < ActiveRecord::Base
     Visit.record_visit!(submitter_id, new_url.id)
   end
 
+  def num_clicks
+    visits.count
+  end
+
+  def num_uniques
+    visits.uniq.count #count(:visitors).distinct
+  end
+
+  def num_recent_uniques
+    visits.uniq.count { |visit| visit.created_at > 10.minutes.ago }
+  end
+
 end
