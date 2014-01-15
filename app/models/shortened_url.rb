@@ -19,23 +19,21 @@ class ShortenedUrl < ActiveRecord::Base
   has_many :visitors, :through => :visits, :source => :visitor
 
   def self.random_code
-    SecureRandom.urlsafe_base64
+    begin
+      short_url = SecureRandom.urlsafe_base64
+    end until !exists?(short_url: short_url)
+
+    short_url
   end
 
   def self.create_for_user_and_long_url!(submitter, long_url)
     short_url = ShortenedUrl.random_code
 
-    until where("short_url != ?", short_url)
-      short_url = ShortenedUrl.random_code
-    end
-
     submitter_id = submitter.id
-
 
     new_url = ShortenedUrl.create!(:submitter_id => submitter_id,
                          :long_url => long_url,
                          :short_url => short_url)
-    #Visit.record_visit!(submitter_id, new_url.id)
     new_url
   end
 
@@ -48,7 +46,7 @@ class ShortenedUrl < ActiveRecord::Base
   end
 
   def num_recent_uniques
-    visits.select { |visit| visit.created_at > 10.minutes.ago }.uniq.count
+    visits.where(created_at: 10.minutes.ago..Time.now).uniq.count
   end
 
 end
